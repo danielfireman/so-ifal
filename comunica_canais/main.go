@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Mensagem. Simula uma entrada de uma lista telefônica.
 type item struct {
 	nome     string
 	telefone string
@@ -13,30 +14,35 @@ type item struct {
 // canal compartilhado.
 var lista = make(chan item)
 
+// Tarefa escritora que vai ser executada em segundo plano.
+// Escreve o item passado como parâmetro no canal.
 func escritora(i item) {
-	// coloca o item passado como parâmetro no canal.
+	fmt.Printf("[Escritora] Escrevendo iten %v na lista. Agora são: %v\n", i, time.Now().Format("15:04:05"))
 	lista <- i
+	fmt.Printf("[Escritora] Item %v escrito na lista. Agora são: %v\n", i, time.Now().Format("15:04:05"))
 }
 
+// Recebe a mensagem do canal (o que foi adicionado primeiro)
+// Também executada em segundo plano.
 func leitora() {
-	// retira um elemento do canal (o que foi adicionado primeiro)
+	fmt.Printf("[Leitora] Aguardando item ser adicionado a lista. Agora são: %v\n", time.Now().Format("15:04:05"))
 	i := <-lista
-	fmt.Println(i)
+	fmt.Printf("[Leitora] Item adicionado a lista: %v. Agora são: %v\n", i, time.Now().Format("15:04:05"))
 }
 
 func main() {
-	marcos := item{"Marcos Soares", "8212345678"}
 	// A função escritora vai ser executada numa outra linha de
 	// execução (thread) recebendo como parâmetro da execução
 	// o item da lista a ser inserido (marcos)
-	go escritora(marcos)
+	go escritora(item{"Marcos Soares", "8212345678"})
+
+	time.Sleep(1 * time.Second)
 
 	// a função leitora vai imprimir o item da lista preveamente
 	// adicionado
 	go leitora()
 
-	thiago := item{"Thiago Gazaroli", "8256781234"}
-	go escritora(thiago)
+	go escritora(item{"Thiago Gazaroli", "8256781234"})
 
 	go leitora()
 
