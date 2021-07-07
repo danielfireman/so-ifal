@@ -11,15 +11,15 @@ type item struct {
 }
 
 // Thread escritora escreve um ou mais itens na lista.
-func escritora(lista chan item, itens ...item) {
-	fmt.Printf("[Escritora] Escrevendo iten(s) %v na lista. Agora são: %v\n", itens, time.Now().Format("15:04:05"))
+func escritora(id int, lista chan item, itens ...item) {
+	fmt.Printf("[Escritora %d] Escrevendo iten(s) %v na lista. Agora são: %v\n", id, itens, time.Now().Format("15:04:05"))
 	for _, i := range itens {
 		// A diretiva select bloqueia até que um dos casos (eventos) aconteça.
 		select {
 		case lista <- i:
-			fmt.Printf("[Escritora] Item %v escrito na lista. Agora são: %v\n", i, time.Now().Format("15:04:05"))
+			fmt.Printf("[Escritora %d] Item %v escrito na lista. Agora são: %v\n", id, i, time.Now().Format("15:04:05"))
 		case <-time.After(1 * time.Second):
-			fmt.Printf("[Escritora] Timeout. Agora são: %v\n", time.Now().Format("15:04:05"))
+			fmt.Printf("[Escritora %d] Timeout. Agora são: %v\n", id, time.Now().Format("15:04:05"))
 		}
 	}
 }
@@ -51,7 +51,8 @@ func main() {
 	// execução (thread). Ela tentará inserir dois elementos e
 	// deve dar timeout na tentativa de inserir o segundo pois o
 	// canal tem capacidade 1.
-	go escritora(lista, item{"Marcos Soares", "8212345678"}, item{"Bezerra da Silva", "820982309813"})
+	go escritora(1, lista, item{"Marcos Soares", "8212345678"})
+	go escritora(2, lista, item{"Bezerra da Silva", "820982309813"})
 
 	// Espera para visualizar as tentativas de operação de escrita.
 	time.Sleep(2 * time.Second)
