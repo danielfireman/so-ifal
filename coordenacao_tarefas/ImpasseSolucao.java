@@ -2,14 +2,14 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Impasse {
+public class ImpasseSolucao {
     static final int nThreads = 10;
     static final int nSteps = 10000;
 
     public static void main(String[] args) throws InterruptedException {
-        Conta conta1 = new Conta();
+        Conta conta1 = new Conta(1);
         conta1.deposito(100000);
-        Conta conta2 = new Conta();
+        Conta conta2 = new Conta(2);
 
         // Cria todas as threads.
         Thread[] transf12 = new Thread[nThreads];
@@ -46,7 +46,12 @@ public class Impasse {
 
     static class Conta {
         double saldo = 0;
+        int num;
         Lock mutex = new ReentrantLock();
+        
+        Conta(int num) {
+            this.num = num;
+        }
 
         void deposito(double valor) {
             saldo = saldo + valor;
@@ -64,8 +69,13 @@ public class Impasse {
         TransferThread(String id, Conta c1, Conta c2) {
             super(id);
             this.id = id;
-            this.conta1 = c1;
-            this.conta2 = c2;
+            if (c1.num > c2.num) {
+                this.conta1 = c1;
+                this.conta2 = c2;
+            } else {
+                this.conta1 = c2;
+                this.conta2 = c1;
+            }
         }
 
         @Override
