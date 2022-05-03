@@ -3,12 +3,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-    
+
     private static final int numThreads = 8;
 
     // Código da linha de execução principal, que é iniciada quando
     // o processo é iniciado.
     public static void main(String[] args) throws InterruptedException {
+        // memoriaCompartilhada é uma variável do processo, acessível por
+        // todas as threads. Ela fica armazenada na área de
+        // memória do processo, que é comum a todas as linhas
+        // de execução criadas por ele.
         List memoriaCompartilhada = new ArrayList();
         memoriaCompartilhada.add(1);
         memoriaCompartilhada.add(2);
@@ -28,8 +32,9 @@ public class Main {
 
     public static class Sleeper implements Runnable {
         int tid, numThreads;
-        List memoriaCompartilhada;
+        List memoriaCompartilhada; // guarda um ponteiro para o estado do processo (HEAP).
 
+        // Parâmetro chegam via pilha e permanecem na pilha.
         public Sleeper(int tid, int numThreads, List memoriaCompartilhada) {
             this.tid = tid;
             this.numThreads = numThreads;
@@ -38,10 +43,11 @@ public class Main {
 
         @Override
         public void run() {
-            System.out.printf("Olá da thread %02d de %02d. A área de memória compartilhada tem %d elementos.\n", tid, numThreads, memoriaCompartilhada.size());
+            System.out.printf("Olá da thread %02d de %02d. A área de memória compartilhada tem %d elementos.\n", tid,
+                    numThreads, memoriaCompartilhada.size());
             try {
                 // Thread.sleep espera o tempo em milissegundos.
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(-1);
