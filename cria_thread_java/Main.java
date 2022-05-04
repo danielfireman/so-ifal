@@ -13,6 +13,8 @@ public class Main {
         // todas as threads. Ela fica armazenada na área de
         // memória do processo, que é comum a todas as linhas
         // de execução criadas por ele.
+        // De forma super simplificada, uma lista é um arranjo (array)
+        // de tamanho dinâmico (modificado em tempo de execução).
         List memoriaCompartilhada = new ArrayList();
         memoriaCompartilhada.add(1);
         memoriaCompartilhada.add(2);
@@ -22,6 +24,9 @@ public class Main {
             Thread t = new Thread(new Sleeper(i, numThreads, memoriaCompartilhada));
             t.setDaemon(true); // evita que o programa principal espere pelas threads.
             t.start();
+
+            // Sleeper t = new Sleeper(i, numThreads, memoriaCompartilhada);
+            // t.run();
         }
         System.out.println("Main: Tchau!");
         // Note que o processo foi finalizado sem esperar que
@@ -45,6 +50,7 @@ public class Main {
         public void run() {
             System.out.printf("Olá da thread %02d de %02d. A área de memória compartilhada tem %d elementos.\n", tid,
                     numThreads, memoriaCompartilhada.size());
+            memoriaCompartilhada.add(tid);
             try {
                 // Thread.sleep espera o tempo em milissegundos.
                 Thread.sleep(3000);
