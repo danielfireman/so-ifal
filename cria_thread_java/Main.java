@@ -1,56 +1,66 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 
 public class Main {
 
-    private static final int numThreads = 8;
+    private static final int numThreads = 10;
+    private static final int memSize = 10;
 
     // Código da linha de execução principal, que é iniciada quando
     // o processo é iniciado.
     public static void main(String[] args) throws InterruptedException {
-        // memoriaCompartilhada é uma variável do processo, acessível por
+        long startTime = System.currentTimeMillis();
+
+        // memoria é uma variável do processo, acessível por
         // todas as threads. Ela fica armazenada na área de
         // memória do processo, que é comum a todas as linhas
         // de execução criadas por ele.
-        // De forma super simplificada, uma lista é um arranjo (array)
-        // de tamanho dinâmico (modificado em tempo de execução).
-        List memoriaCompartilhada = new ArrayList();
-        memoriaCompartilhada.add(1);
-        memoriaCompartilhada.add(2);
+        int[] memoria = new int[memSize];
+        for (int i=0; i<memSize; i++) {
+            memoria[i] = i;
+        }
 
+        Thread[] threads = new Thread[numThreads];
         for (int i = 0; i < numThreads; i++) {
             System.out.printf("Main: criando thread: %02d\n", i);
-            Thread t = new Thread(new Sleeper(i, numThreads, memoriaCompartilhada));
-            t.setDaemon(true); // evita que o programa principal espere pelas threads.
-            t.start();
-
-            // Sleeper t = new Sleeper(i, numThreads, memoriaCompartilhada);
-            // t.run();
+            threads[i] = new Sleeper(i, numThreads, memoria);
+            //threads[i]    .setDaemon(true); // evita que o programa principal espere pelas threads.
+            threads[i].start();  // inicia thread
         }
-        System.out.println("Main: Tchau!");
+
+    //    Thread.sleep(3000);
+    //    System.out.println("Thread main esperou 3s");   
+        esperaThreads(threads);  // espera as threads restantes terminarem.
+
+        long finishTime = System.currentTimeMillis();
+        double execTime = (double)(finishTime - startTime)/(double)1000;
+        System.out.printf("Main: Tchau! Executou em: %f segundos\n", execTime);
         // Note que o processo foi finalizado sem esperar que
         // as threads terminem.
         // Podemos utilizar mecanismos de sincronização para
         // aguardar as threads terminarem.
     }
+    
+    public static void esperaThreads(Thread[] threads) throws InterruptedException {
+        for (Thread t : threads) {
+            t.join();
+        }
+    }
 
-    public static class Sleeper implements Runnable {
+    public static class Sleeper extends Thread {
         int tid, numThreads;
-        List memoriaCompartilhada; // guarda um ponteiro para o estado do processo (HEAP).
+        int[] memoria; // guarda um ponteiro para o estado do processo (HEAP).
 
         // Parâmetro chegam via pilha e permanecem na pilha.
-        public Sleeper(int tid, int numThreads, List memoriaCompartilhada) {
+        public Sleeper(int tid, int numThreads, int[] memoria) {
             this.tid = tid;
             this.numThreads = numThreads;
-            this.memoriaCompartilhada = memoriaCompartilhada;
+            this.memoria = memoria;
         }
 
         @Override
         public void run() {
-            System.out.printf("Olá da thread %02d de %02d. A área de memória compartilhada tem %d elementos.\n", tid,
-                    numThreads, memoriaCompartilhada.size());
-            memoriaCompartilhada.add(tid);
+            System.out.printf("Olá da thread %02d de %02d. A área de memória compartilhada: %s.\n", tid,
+                    numThreads, Arrays.toString(memoria));
             try {
                 // Thread.sleep espera o tempo em milissegundos.
                 Thread.sleep(3000);
