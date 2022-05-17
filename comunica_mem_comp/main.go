@@ -12,13 +12,13 @@ type item struct {
 
 // variável global (área de memória compartilhada)
 var lista = []item{
-	{"Marcos Soares", "8212345678"},
-	{"Thiago Gazaroli", "8256781234"},
+	{"Arthur Napoleão", "8212345678"},
+	{"Millena Cordeiro", "822312312"},
 }
 
 // A função escritora adiciona um item a lista.
 func escritora() {
-	lista = append(lista, item{"Ismael Feliz", "8298765678"})
+	lista = append(lista, item{"Martinho Lutero", "8298765678"})
 }
 
 func leitora() {
@@ -26,7 +26,7 @@ func leitora() {
 }
 
 func main() {
-	fmt.Printf("%v\n", lista)
+	fmt.Printf("Main: %v\n", lista)
 
 	go escritora()
 	go leitora()
@@ -39,5 +39,5 @@ func main() {
 	// Ao executar várias vezes, vai ficar claro a necessidade
 	// de coordenação, principalmente quando a comunicação
 	// acontece via memória compartilhada.
-	fmt.Printf("%v\n", lista)
+	fmt.Printf("Main: %v\n", lista)
 }
