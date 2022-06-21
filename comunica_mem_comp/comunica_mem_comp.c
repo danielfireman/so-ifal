@@ -6,29 +6,33 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-const int NUM_THREADS = 5;
-const int NUM_REPETICOES = 10;
+const int NUM_THREADS = 5;    // número de threads criadas.
+const int NUM_REPETICOES = 5; // número de repetições do laço de cada thread.
 
 typedef struct {
-  int dado_thread;
-  pid_t thread_mae;
-} thread_info;
+  int id;
+  int *comp;
+} dado_thread;
 
 // Função que define comportamento das threads
-void *threads(void *dado) {
+void *threads(void *compartilhado) {
   // Obtém identificadores da thread e processo
   pid_t tid = syscall(SYS_gettid);
   pid_t pid = syscall(SYS_getpid);
-  thread_info *infot =
-      (thread_info *)dado; // converte de volta para thread_info
+  dado_thread *dado = (dado_thread *)compartilhado;
 
+  printf("Olá, sou a thread %d, tenho o identificador %d e estou no "
+         "processo %d.\n",
+         dado->id, tid, pid);
   // Loop principal da thread.
   for (int i = 0; i < NUM_REPETICOES; i++) {
-    printf("Olá, sou a thread %d, tenho o identificador %d e estou no "
-           "processo %d. Minha mãe é a thread %d.\n",
-           (*infot).dado_thread, tid, pid, (*infot).thread_mae);
+    printf("Thread %d está na repetição %d\n", dado->id, i);
     sleep(2);
   }
+
+  dado->comp[dado->id] = tid; // atualiza array.
+  free(dado);                 // desalocar memória criada para a struct.
+  return 0;
 }
 
 int main() {
@@ -39,19 +43,24 @@ int main() {
          "%d \n",
          tid, pid);
 
+  // Cria threads.
   pthread_t thread[NUM_THREADS];
+  int comp[NUM_THREADS];
   for (int i = 0; i < NUM_THREADS; i++) {
-
-    // Cria threads.
-    thread_info infot;
-    infot.dado_thread = i;
-    infot.thread_mae = tid;
-    pthread_create(&thread[i], NULL, threads, (void *)&infot);
+    dado_thread *dado = malloc(sizeof(dado_thread));
+    dado->id = i;
+    dado->comp = comp;
+    pthread_create(&thread[i], NULL, threads, (void *)dado);
   }
 
-  // Aguarda as threads.
-  for (long i = 0; i <= NUM_THREADS; i++) {
+  // Aguarda as threads finalizarem a execução.
+  for (int i = 0; i < NUM_THREADS; i++) {
     pthread_join(thread[i], NULL);
+  }
+
+  printf("Valores da memória compartilhada:\n");
+  for (int i = 0; i < NUM_THREADS; i++) {
+    printf("Thread %d valor %d\n", i, comp[i]);
   }
 
   pthread_exit(NULL); // encerrando a thread principal
