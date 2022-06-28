@@ -4,12 +4,15 @@
 
 **Compilar**
 ```
-gcc leitora_posix.c -o leitora -lrt
-gcc escritora_posix.c -o escritora -lrt
+make build
 ```
 
 **Executar**
 ```
-./escritora
-./leitura
+./cria_fila
+./escreve_fila_assinc
+./escreve_fila_assinc
+./le_fila_assinc
+./le_fila_assinc
+./encerra_fila
 ```

@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "comunica_assinc_posix.h"
+#include "comunica_fila.h"
 
 int main() {
-  mqd_t fila = mq_open(QUEUE_NAME, O_RDONLY);
+  mqd_t fila = mq_open(QUEUE_NAME, O_RDONLY | O_NONBLOCK);
   if (fila < 0) {
     perror("Erro abrindo fila de mensagens");
     exit(1);
@@ -22,11 +22,10 @@ int main() {
     exit(1);
   }
   time(&now);
-  printf("[Leitora] Item %s-%s lido na lista. Agora são: %s\n.", i.nome,
+  printf("[Leitora] Item %s-%s lido na lista. Agora são: %s\n", i.nome,
          i.telefone, ctime(&now));
 
   // Fechando a fila.
   mq_close(fila);
-  mq_unlink("/so-ifal-queue");
   return 0;
 }
