@@ -4,16 +4,14 @@
 
 **Compilar**
 ```
-gcc le_fila.c -o le_fila -lrt
-gcc escreve_fila.c -o escreve_fila -lrt
-gcc cria_fila.c -o cria_fila -lrt
-gcc encerra_fila.c -o encerra_fila -lrt
+make build
 ```
 
 **Executar**
 ```
-./cria_fila
-./escreve_fila
-./cria_fila
-./encerra_fila
+make cria_fila
+
+# executa leituras e escritas
+
+make encerra_fila
 ```
