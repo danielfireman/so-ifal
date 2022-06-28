@@ -1,23 +1,11 @@
-#include <errno.h>
-#include <fcntl.h> /* For O_* constants */
 #include <mqueue.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h> /* For mode constants */
 #include <time.h>
-
-#define MODO 0666
-#define PRIORIDADE 0
-
-// mensagem
-// tem que ser um char a mais por que os strings tem que ser null-terminated.
-typedef struct {
-  char nome[101];
-  char telefone[11];
-} item;
+#include "comunica_assinc_posix.h"
 
 int main() {
-  mqd_t fila = mq_open("/so-ifal-queue", O_RDONLY);
+  mqd_t fila = mq_open(QUEUE_NAME, O_RDONLY);
   if (fila < 0) {
     perror("Erro abrindo fila de mensagens");
     exit(1);

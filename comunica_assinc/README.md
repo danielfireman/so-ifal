@@ -4,8 +4,8 @@
 
 **Compilar**
 ```
-gcc leitora.c -o leitora -lrt
-gcc escritora.c -o escritora -lrt
+gcc leitora_posix.c -o leitora -lrt
+gcc escritora_posix.c -o escritora -lrt
 ```
 
 **Executar**
